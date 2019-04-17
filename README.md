@@ -1,4 +1,4 @@
-﻿1. private修饰的方法可以通过反射访问，那么private的意义是什么
+1. private修饰的方法可以通过反射访问，那么private的意义是什么
 private设计为了表达封装而不是安全性，为了在常规java使用中提供访问约束。反射是一种hack技术。
 2. java类初始化顺序
 基类静态代码块和静态成员变量，子类静态代码块和静态成员变量，基类普通代码块和成员变量，基类构造函数。子类普通代码块和成员变量。子类构造函数。
@@ -75,7 +75,7 @@ callable是带有返回值的runnable。可以通过future异步得获取callabl
 ==号比较原始对象的值，对于object比较的是引用不是对象本事。equals是object的方法，默认使用==比较，可以重写来进行对象比较，例如string
 36. 什么是aop
 面向切面是一种编程范式。在不影响原有代码的前提下进行代码织入。
-如果spring的ExceptionHandler注释，拦截指定的异常进行处理。
+如果spring的ExceptionHandler注释，拦截指定的异常进行处理。比如junitTest的beforeclass和afterclass注解。
 37. restapi的意义
 38. java如何判断对象可回收
 引用计数器和可达性分析
@@ -84,10 +84,32 @@ callable是带有返回值的runnable。可以通过future异步得获取callabl
 40. 什么是java
 面向对象的高级编程语言。有跨平台的特性，编译成bytecode在jvm上运行而不用关心底层操作系统。有自动内存管理机制。
 41. 抽象类的意义
+抽象类提供接口方法的默认实现。抽象类也可以定义构造方法，其行为和普通类继承时一致。实例就是adapter模式。
+提取公共方法。
 42. utf-8编码中的中文占几个字节；int型几个字节？
+utf-8是基于unicode字符集的一种变长的编码方式，最大表示31个bit的字符。使用前缀来实现变长。中文占三个字节，所有ascii码包括数字都可以用一个字节表示。
 43. 说一下泛型原理，并举例说明
+java的泛型有两种使用方式，跟在类型后方或者加在方法的修饰符里。一个方法是不是泛型方法和这个类是不是泛型的没有关系。java的泛型使用类型擦除机制实现，编译器会将泛型全部转换成上界类型。在runtime时java是不区分泛型的，比如对比两个参数类型不同的List的class，结果是相等的，使用javap反编译class文件也可以证实这一点。泛型的作用相比object能提供类型安全校验，避免写繁琐的类型转换代码，此外也能增强可读性。实战中经常利用泛型构造容器类。
 44. String为什么要设计成不可变的？
+常量池的实现中，保存的是string的引用。
+类加载会用到string作为参数，使用不可变string更加安全。
+不可变意味着线程安全。
 45. ConcurrentHashMap的实现原理
+ConcurrentHash数据结构与HashMap类似，使用桶+链表+红黑树实现。实现并发的核心技术是volalite关键字，cas，sychronize，用复杂的并发算法做支撑。基本数据结构为Node，另外用TreeNode表示红黑树，用TreeBin对红黑树进行封装。Node的hash值有两类，大于0表示正常Node节点的hash值，小于零表示特殊节点，特殊节点有ForwardBin表示正在扩容，TreeBin表示红黑树等。这样设计的好处是只需要判断一个bit就可以知道是常规bin还是特殊bin。put操作在没有发生hash碰撞时使用cas进行插入，最有效率，否则使用synchronize锁定一个bin进行插入操作。在插入式如果正好有一个扩容动作也在进行，put操作会转而去帮助一起扩容。table的初始化操作也是在put过程中触发的，如果有两个线程同时触发了初始化动作，那么竞争失败的一方会进行自旋同时尝试yield。链表转换成红黑树的操作也是在put完以后触发的。get方法底层使用unsafe的voliate方法读取一个bin，在bin进行遍历过程中也不用担心线程安全问题，因为Node的val和next指针也都是voliate的。get方法不会加锁。构造函数主要有两个参数初始容量，负载因子，和预计并发量。初始容量会保证大于等于预计并发量。
+46. java yield的用法
+表示可以挂起执行更重要的任务。给线程调度器一个提示，可以执行更重要的其他任务了，线程调度器可以不予理睬。yield并不能保证停顿。
+47. error和exception区别
+error表示很严重的问题，难以恢复。比如NoSuchMethodError，OutOfMemeoryError，StackOverFlowError。
+Exception表示正常运行不会碰到的问题，比如IndexOutOfBound， NoSuchFile， IllegalArguement，NullPointException。
+48. java什么时候会发生内存泄漏
+当不使用的对象没有被回收的时候。长生命周期的对象引用了短生命周期的对象。比如往一个全局的map中不停的放对象，但是又不使用。ConcurrentHashMap一旦扩容以后无法减小，所以也有可能造成内存泄漏。
+49. Vector线程安全吗？
+安全。使用synchronize实现的。
+50. 什么是Java Timer类？如何创建一个有特定时间间隔的任务？
+工具类，用来定时或者周期性执行任务。使用time schedule一个timetask。timetask是一个runnable对象。
+51. threadlocal的用法和意义
+
+
 
 
 
